@@ -14,7 +14,7 @@ namespace BSPValidator {
                 return;
             }
 
-            Stream s = File.OpenRead(args[1]);
+            Stream s = File.OpenRead(args[0]);
             BSP bsp = new BSP(s);
         }
     }
