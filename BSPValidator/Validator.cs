@@ -48,8 +48,15 @@ namespace BSPValidator {
         public void Validate() {
             if(bsp.version != TF2_BSP_VERSION) error("Wrong BSP Version");
 
+            ValidateTextureStrings();
             ValidateStaticModels();
             ValidateEntities();
+        }
+
+        private void ValidateTextureStrings() {
+            foreach(var textureName in bsp.textureStringList) {
+                ValidateMaterial(textureName);
+            }
         }
 
         private void ValidateStaticModels() {
@@ -516,8 +523,8 @@ namespace BSPValidator {
 
         private void ValidateFile(string name) {
             //Try the pakfile
-            var entry = bsp.pakFile.GetEntry(name);
-            if(entry != null) return;
+            var entry = bsp.pakFile.FindEntry(name,true);
+            if(entry != -1) return;
 
         }
 
@@ -532,7 +539,7 @@ namespace BSPValidator {
         }
 
         private void ValidateMaterial(string name) {
-            ValidateFile(name);
+            ValidateFile($"materials/{name}.vmt");
         }
 
         private void ValidateTexture(string name) {

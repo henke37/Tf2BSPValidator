@@ -26,10 +26,32 @@ namespace BSPParser {
             r.BaseStream.Seek(bytesToSkip, SeekOrigin.Current);
         }
 
+        public static void Seek(this BinaryReader r, int bytesToSkip) {
+            r.BaseStream.Seek(bytesToSkip, SeekOrigin.Begin);
+        }
+
+        public static void Seek(this BinaryReader r, int bytesToSkip, SeekOrigin seekOrigin) {
+            r.BaseStream.Seek(bytesToSkip, seekOrigin);
+        }
+
         public static void WriteLenPrefixedUTFString(this BinaryWriter w, string str) {
             var ba = Encoding.UTF8.GetBytes(str + "\0");
             w.Write((int)ba.Length);
             w.Write(ba);
+        }
+
+        public static long BytesLeft(this BinaryReader r) {
+            return r.BaseStream.Length - r.BaseStream.Position;
+        }
+
+        public static string ReadNullTerminatedUTF8String(this BinaryReader r) {
+            var l = new List<Byte>();
+            for(; ; ) {
+                byte b = r.ReadByte();
+                if(b == 0) break;
+                l.Add(b);
+            }
+            return new string(Encoding.UTF8.GetChars(l.ToArray()));
         }
     }
 }

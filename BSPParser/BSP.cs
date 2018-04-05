@@ -15,6 +15,7 @@ namespace BSPParser
         public KeyValue[] entData;
         public string[] staticPropModels;
         public StaticProp[] staticProps;
+        public List<string> textureStringList;
 
         public ZipFile pakFile;
 
@@ -52,10 +53,28 @@ namespace BSPParser
                     for(uint lumpIndex = 0; lumpIndex < lumpCount; ++lumpIndex) {
                         lumps[lumpIndex] = new Lump_t(reader);
                     }
-
+                    ParseTextureStringLumps();
                     ParseEntData();
                     ParseGameLump();
                     ParsePakFileLump();
+                }
+            }
+
+            private void ParseTextureStringLumps() {
+                using(var offsetReader = new BinaryReader(GetLump(LumpType.LUMP_TEXDATA_STRING_TABLE))) {
+                    using(var dataReader = new BinaryReader(GetLump(LumpType.LUMP_TEXDATA_STRING_DATA))) {
+                        ParseTextureStringLumps(offsetReader, dataReader);
+                    }
+                }
+            }
+
+            private void ParseTextureStringLumps(BinaryReader offsetReader, BinaryReader dataReader) {
+                bsp.textureStringList = new List<string>();
+                while(offsetReader.BytesLeft()>4) {
+                    int offset = offsetReader.ReadInt32();
+                    dataReader.Seek(offset);
+                    string textureName = dataReader.ReadNullTerminatedUTF8String();
+                    bsp.textureStringList.Add(textureName);
                 }
             }
 
