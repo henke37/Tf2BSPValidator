@@ -89,12 +89,12 @@ namespace BSPValidator {
                     break;
 
                 case "team_control_point":
-                    EnsureZeroOrOneTargetEntity(kv["team_previouspoint_2_0"].GetString());
-                    EnsureZeroOrOneTargetEntity(kv["team_previouspoint_2_1"].GetString());
-                    EnsureZeroOrOneTargetEntity(kv["team_previouspoint_2_2"].GetString());
-                    EnsureZeroOrOneTargetEntity(kv["team_previouspoint_3_0"].GetString());
-                    EnsureZeroOrOneTargetEntity(kv["team_previouspoint_3_1"].GetString());
-                    EnsureZeroOrOneTargetEntity(kv["team_previouspoint_3_2"].GetString());
+                    EnsureZeroOrOneTargetEntity(kv["team_previouspoint_2_0"], "team_control_point");
+                    EnsureZeroOrOneTargetEntity(kv["team_previouspoint_2_1"], "team_control_point");
+                    EnsureZeroOrOneTargetEntity(kv["team_previouspoint_2_2"], "team_control_point");
+                    EnsureZeroOrOneTargetEntity(kv["team_previouspoint_3_0"], "team_control_point");
+                    EnsureZeroOrOneTargetEntity(kv["team_previouspoint_3_1"], "team_control_point");
+                    EnsureZeroOrOneTargetEntity(kv["team_previouspoint_3_2"], "team_control_point");
                     break;
 
 
@@ -148,17 +148,26 @@ namespace BSPValidator {
             ValidateModel(modelOverrideKv.GetString());
         }
 
-        private void EnsureOneTargetEntity(string targetName) {
+        private void EnsureOneTargetEntity(string targetName, string targetClass=null) {
             if(!entTargetNameMap.TryGetValue(targetName, out List<KeyValue> nameList)) {
                 error($"Missing entity with targetname {targetName}");
             }
             if(nameList.Count != 1) error($"Duplicate entities with targetname {targetName}");
+            var target = nameList[0];
+            if(targetClass != null && target["classname"].ToString() != targetClass) error("Target entity class mismatch");
         }
-        private void EnsureZeroOrOneTargetEntity(string targetName) {
+
+        private void EnsureZeroOrOneTargetEntity(KeyValue targetName, string targetClass = null) {
+            if(targetName == null) return;
+            EnsureZeroOrOneTargetEntity(targetName.GetString());
+        }
+        private void EnsureZeroOrOneTargetEntity(string targetName, string targetClass = null) {
             if(!entTargetNameMap.TryGetValue(targetName, out List<KeyValue> nameList)) {
                 return;
             }
             if(nameList.Count != 1) error($"Duplicate entities with targetname {targetName}");
+            var target = nameList[0];
+            if(targetClass != null && target["classname"].ToString() != targetClass) error("Target entity class mismatch");
         }
 
         private void BuildEntTargetNameLUT() {
