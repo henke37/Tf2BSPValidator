@@ -29,7 +29,7 @@ namespace BSPValidator {
         }
 
         private void MountGame(int appId) {
-            string installPath=SteamHelper.GetInstallPathForApp(appId);
+            string installPath = SteamHelper.GetInstallPathForApp(appId);
 
         }
 
@@ -107,6 +107,58 @@ namespace BSPValidator {
                     ValidateControlPointLayout(kv["caplayout"].GetString());
                     break;
 
+                case "trigger_capture_area":
+                    EnsureOneTargetEntity(kv["area_cap_point"], "team_control_point");
+                    break;
+
+                case "team_train_watcher":
+                    EnsureZeroOrOneTargetEntity(kv["env_spark_name"], "env_spark");
+                    EnsureOneTargetEntity(kv["train"], "func_tracktrain");
+                    EnsureOneTargetEntity(kv["start_node"], "path_track");
+                    EnsureOneTargetEntity(kv["goal_node"], "path_track");
+
+                    EnsureZeroOrOneTargetEntity(kv["linked_pathtrack_1"], "path_track");
+                    EnsureZeroOrOneTargetEntity(kv["linked_cp_1"], "team_control_point");
+                    EnsureZeroOrOneTargetEntity(kv["linked_pathtrack_2"], "path_track");
+                    EnsureZeroOrOneTargetEntity(kv["linked_cp_2"], "team_control_point");
+                    EnsureZeroOrOneTargetEntity(kv["linked_pathtrack_3"], "path_track");
+                    EnsureZeroOrOneTargetEntity(kv["linked_cp_3"], "team_control_point");
+                    EnsureZeroOrOneTargetEntity(kv["linked_pathtrack_4"], "path_track");
+                    EnsureZeroOrOneTargetEntity(kv["linked_cp_4"], "team_control_point");
+                    EnsureZeroOrOneTargetEntity(kv["linked_pathtrack_5"], "path_track");
+                    EnsureZeroOrOneTargetEntity(kv["linked_cp_5"], "team_control_point");
+                    EnsureZeroOrOneTargetEntity(kv["linked_pathtrack_6"], "path_track");
+                    EnsureZeroOrOneTargetEntity(kv["linked_cp_6"], "team_control_point");
+                    EnsureZeroOrOneTargetEntity(kv["linked_pathtrack_7"], "path_track");
+                    EnsureZeroOrOneTargetEntity(kv["linked_cp_7"], "team_control_point");
+                    EnsureZeroOrOneTargetEntity(kv["linked_pathtrack_8"], "path_track");
+                    EnsureZeroOrOneTargetEntity(kv["linked_cp_8"], "team_control_point");
+                    break;
+
+                case "obj_teleporter":
+                    EnsureZeroOrOneTargetEntity(kv["matchingTeleporter"], "obj_teleporter");
+                    break;
+
+                case "tf_robot_destruction_robot_spawn":
+                    EnsureOneTargetEntity(kv["startpath"], "path_track");
+                    break;
+
+                case "tf_logic_player_destruction":
+                    ValidateModel(kv["prop_model_name"].GetString());
+                    break;
+
+                case "tf_logic_cp_timer":
+                    EnsureOneTargetEntity(kv["controlpoint"], "team_control_point");
+                    break;
+
+                case "entity_spawn_point":
+                    EnsureOneTargetEntity(kv["spawn_manager_name"], "entity_spawn_manager");
+                    break;
+
+                case "tf_generic_bomb":
+                    ValidateModel(kv["model"], kv["skin"]);
+                    break;
+
                 //entclasess with no current validation
                 case "worldspawn":
                 case "func_door":
@@ -123,7 +175,6 @@ namespace BSPValidator {
                 case "water_lod_control":
                 case "team_round_timer":
                 case "func_respawnroom":
-                case "trigger_capture_area":
                 case "game_round_win":
                 case "logic_auto":
                 case "logic_relay":
@@ -139,7 +190,7 @@ namespace BSPValidator {
         }
 
         private void ValidateControlPointLayout(string v) {
-            if(!Regex.IsMatch(v,@"^[0-7 ,]*[0-7]$")) error("Bad capture point layout");
+            if(!Regex.IsMatch(v, @"^[0-7 ,]*[0-7]$")) error("Bad capture point layout");
         }
 
         private void ValidateItemEntity(KeyValue kv) {
@@ -148,7 +199,16 @@ namespace BSPValidator {
             ValidateModel(modelOverrideKv.GetString());
         }
 
-        private void EnsureOneTargetEntity(string targetName, string targetClass=null) {
+
+        private void EnsureOneTargetEntity(KeyValue targetName, string targetClass = null) {
+            if(targetName == null) {
+                error("No entity specified");
+                return;
+            }
+            EnsureOneTargetEntity(targetName.GetString(), targetClass);
+        }
+
+        private void EnsureOneTargetEntity(string targetName, string targetClass = null) {
             if(!entTargetNameMap.TryGetValue(targetName, out List<KeyValue> nameList)) {
                 error($"Missing entity with targetname {targetName}");
             }
@@ -159,7 +219,7 @@ namespace BSPValidator {
 
         private void EnsureZeroOrOneTargetEntity(KeyValue targetName, string targetClass = null) {
             if(targetName == null) return;
-            EnsureZeroOrOneTargetEntity(targetName.GetString());
+            EnsureZeroOrOneTargetEntity(targetName.GetString(), targetClass);
         }
         private void EnsureZeroOrOneTargetEntity(string targetName, string targetClass = null) {
             if(!entTargetNameMap.TryGetValue(targetName, out List<KeyValue> nameList)) {
@@ -178,7 +238,7 @@ namespace BSPValidator {
                 if(nameKv == null) continue;
                 string targetName = nameKv.GetString();
                 List<KeyValue> nameList;
-                if(!entTargetNameMap.TryGetValue(targetName,out nameList)) {
+                if(!entTargetNameMap.TryGetValue(targetName, out nameList)) {
                     nameList = new List<KeyValue>();
                     entTargetNameMap.Add(targetName, nameList);
                 }
@@ -188,12 +248,18 @@ namespace BSPValidator {
 
         private void ValidateFile(string name) {
             //Try the pakfile
-            var entry=bsp.pakFile.GetEntry(name);
-            if(entry!=null) return;
+            var entry = bsp.pakFile.GetEntry(name);
+            if(entry != null) return;
 
         }
 
-        private void ValidateModel(string name) {
+
+        private void ValidateModel(KeyValue kvname, KeyValue kvskin = null) {
+            int skin = (kvskin == null) ? 0 : kvskin.GetInt();
+            ValidateModel(kvname.GetString(), skin);
+        }
+
+        private void ValidateModel(string name, int skin = 0) {
             ValidateFile(name);
         }
 
