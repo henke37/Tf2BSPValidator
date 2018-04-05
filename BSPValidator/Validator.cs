@@ -63,6 +63,15 @@ namespace BSPValidator {
                     ValidateModel(kv["model"].GetString());
                     break;
 
+                case "item_healthkit_small":
+                case "item_healthkit_medium":
+                case "item_healthkit_large":
+                case "item_ammopack_small":
+                case "item_ammopack_medium":
+                case "item_ammopack_large":
+                    ValidateItemEntity(kv);
+                    break;
+
                 case "team_control_point":
                     EnsureOneTargetEntity(kv["targetname"].GetString());
                     break;
@@ -72,12 +81,6 @@ namespace BSPValidator {
                 case "func_door":
                 case "func_areaportal":
                 case "info_player_teamspawn":
-                case "item_healthkit_small":
-                case "item_healthkit_medium":
-                case "item_healthkit_large":
-                case "item_ammopack_small":
-                case "item_ammopack_medium":
-                case "item_ammopack_large":
                 case "trigger_multiple":
                 case "trigger_hurt":
                 case "filter_activator_tfteam":
@@ -104,6 +107,12 @@ namespace BSPValidator {
                 default:
                     break;
             }
+        }
+
+        private void ValidateItemEntity(KeyValue kv) {
+            KeyValue modelOverrideKv = kv["powerup_model"];
+            if(modelOverrideKv == null) return;
+            ValidateModel(modelOverrideKv.GetString());
         }
 
         private void EnsureOneTargetEntity(string targetName) {
