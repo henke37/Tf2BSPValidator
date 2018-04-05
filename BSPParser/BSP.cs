@@ -12,6 +12,9 @@ namespace BSPParser
         public uint version;
 
         public KeyValue[] entData;
+        public string[] staticPropModels;
+        public StaticProp[] staticProps;
+
 
         public BSP(Stream stream) {
             Parse(stream);
@@ -77,9 +80,18 @@ namespace BSPParser
 
             private void ParseStaticPropLump(ushort version, BinaryReader r) {
                 uint modelCount = r.ReadUInt32();
-                string[] models = new string[modelCount];
+                bsp.staticPropModels = new string[modelCount];
                 for(uint modelIndex=0;modelIndex<modelCount;++modelIndex) {
-                    models[modelIndex] = r.ReadUTFString(128).TrimEnd('\0');
+                    bsp.staticPropModels[modelIndex] = r.ReadUTFString(128).TrimEnd('\0');
+                }
+
+                int leafCount = r.ReadInt32();
+                r.Skip(leafCount * 2);//don't care about the leaf data
+
+                uint propCount = r.ReadUInt32();
+                bsp.staticProps = new StaticProp[propCount];
+                for(uint propIndex=0;propIndex<propCount;++propIndex) {
+                    bsp.staticProps[propIndex] = new StaticProp(version, r);
                 }
             }
 
@@ -206,6 +218,38 @@ namespace BSPParser
                 }
             }
 
+            
+        }
+
+        public class StaticProp {
+            public Vector Origin;
+
+            public StaticProp(ushort version, BinaryReader r) {
+                if(version < 4) throw new NotImplementedException();
+
+                if(version < 5) return;
+
+                if(version>=6 && version<=7) {
+
+                } else {
+
+                }
+                if(version < 7) return;
+                if(version >= 10) {
+
+                }
+                if(version >= 9) {
+
+                }
+            }
+
+            public struct Vector {
+                public float x, y, z;
+            }
+
+            public struct QAngle {
+                public float x, y, z;
+            }
         }
     }
 }

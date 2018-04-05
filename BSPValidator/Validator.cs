@@ -40,7 +40,14 @@ namespace BSPValidator {
         public void Validate() {
             if(bsp.version != TF2_BSP_VERSION) error("Wrong BSP Version");
 
+            ValidateStaticModels();
             ValidateEntities();
+        }
+
+        private void ValidateStaticModels() {
+            foreach(string modelName in bsp.staticPropModels) {
+                ValidateModel(modelName);
+            }
         }
 
         private void ValidateEntities() {
@@ -138,12 +145,19 @@ namespace BSPValidator {
             }
         }
 
-        private void ValidateModel(string v) {
-            
+        private void ValidateFile(string name) {
+        }
+
+        private void ValidateModel(string name) {
+            ValidateFile(name);
         }
 
         private void ValidateMaterial(string name) {
+            ValidateFile(name);
+        }
 
+        private void ValidateTexture(string name) {
+            ValidateFile(name);
         }
 
         private void error(string msg) {
