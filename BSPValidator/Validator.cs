@@ -110,6 +110,10 @@ namespace BSPValidator {
                 case "trigger_capture_area":
                     EnsureOneTargetEntity(kv["area_cap_point"], "team_control_point");
                     break;
+                case "trigger_timer_door":
+                    EnsureOneTargetEntity(kv["area_cap_point"], "team_control_point");
+                    EnsureOneTargetEntity(kv["door_name"]);
+                    break;
 
                 case "team_train_watcher":
                     EnsureZeroOrOneTargetEntity(kv["env_spark_name"], "env_spark");
@@ -159,11 +163,41 @@ namespace BSPValidator {
                     ValidateModel(kv["model"], kv["skin"]);
                     break;
 
+                case "training_prop_dynamic":
+                    ValidateModel(kv["model"], kv["skin"]);
+                    break;
+
+                case "tf_point_weapon_mimic":
+                    ValidateParticleEffect(kv["ParticleEffect"].GetString());
+                    break;
+
+                case "trigger_catapult":
+                    EnsureOneTargetEntity(kv["launchTarget"]);
+                    break;
+
+                case "tf_glow":
+                    EnsureOneTargetEntity(kv["target"]);
+                    break;
+
+
+                case "info_player_teamspawn":
+                    EnsureZeroOrOneTargetEntity(kv["controlpoint"], "team_control_point");
+                    EnsureZeroOrOneTargetEntity(kv["round_bluespawn"], "team_control_point_round");
+                    EnsureZeroOrOneTargetEntity(kv["round_redspawn"], "team_control_point_round");
+                    break;
+
+                case "item_teamflag":
+                    if(kv["flag_model"]!=null) ValidateModel(kv["flag_model"]);
+                    break;
+
+                case "info_observer_point":
+                    EnsureZeroOrOneTargetEntity(kv["associated_team_entity"]);
+                    break;
+
                 //entclasess with no current validation
                 case "worldspawn":
                 case "func_door":
                 case "func_areaportal":
-                case "info_player_teamspawn":
                 case "trigger_multiple":
                 case "trigger_hurt":
                 case "filter_activator_tfteam":
@@ -180,7 +214,6 @@ namespace BSPValidator {
                 case "logic_relay":
                 case "func_respawnroomvisualizer":
                 case "func_nobuild":
-                case "info_observer_point":
                 case "light":
                     break;
 
@@ -214,7 +247,9 @@ namespace BSPValidator {
             }
             if(nameList.Count != 1) error($"Duplicate entities with targetname {targetName}");
             var target = nameList[0];
-            if(targetClass != null && target["classname"].ToString() != targetClass) error("Target entity class mismatch");
+            if(targetClass != null && target["classname"].GetString() != targetClass) {
+                error("Target entity class mismatch");
+            }
         }
 
         private void EnsureZeroOrOneTargetEntity(KeyValue targetName, string targetClass = null) {
@@ -227,7 +262,9 @@ namespace BSPValidator {
             }
             if(nameList.Count != 1) error($"Duplicate entities with targetname {targetName}");
             var target = nameList[0];
-            if(targetClass != null && target["classname"].ToString() != targetClass) error("Target entity class mismatch");
+            if(targetClass != null && target["classname"].GetString() != targetClass) {
+                error("Target entity class mismatch");
+            }
         }
 
         private void BuildEntTargetNameLUT() {
@@ -269,6 +306,10 @@ namespace BSPValidator {
 
         private void ValidateTexture(string name) {
             ValidateFile(name);
+        }
+
+        private void ValidateParticleEffect(string name) {
+
         }
 
         private void error(string msg) {
