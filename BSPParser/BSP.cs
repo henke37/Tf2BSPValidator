@@ -39,7 +39,7 @@ namespace BSPParser
 
             public void Parse() {
                 using(BinaryReader reader = new BinaryReader(masterStream)) {
-                    string sig = new string(reader.ReadChars(4));
+                    string sig = reader.Read4C(); 
                     if(sig != FILE_SIGNATURE) throw new ArgumentException("That's not a BSP file!");
                     bsp.version = reader.ReadUInt32();
 
@@ -49,7 +49,34 @@ namespace BSPParser
                     }
 
                     ParseEntData();
+                    ParseGameLump();
                 }
+            }
+
+            private void ParseGameLump() {
+                Stream lumpStream = GetLump(LumpType.LUMP_GAME_LUMP);
+                var r = new BinaryReader(lumpStream);
+                uint gameSubLumpCount = r.ReadUInt32();
+
+                for(uint subLumpIndex=0;subLumpIndex<gameSubLumpCount;++subLumpIndex) {
+                    GameLump lump = new GameLump(r);
+
+                    switch(lump.tag) {
+                        case "sprp":
+                            ParseStaticPropLump(lump.version,new SubStream(masterStream, lump.offset,lump.length));
+                            break;
+                    }
+                }
+            }
+
+            private void ParseStaticPropLump(ushort version, Stream stream) {
+                using(BinaryReader r=new BinaryReader(stream)) {
+                    ParseStaticPropLump(version, r);
+                }
+            }
+
+            private void ParseStaticPropLump(ushort version, BinaryReader r) {
+                throw new NotImplementedException();
             }
 
             private void ParseEntData() {
@@ -77,7 +104,7 @@ namespace BSPParser
                     offset = r.ReadUInt32();
                     length = r.ReadUInt32();
                     version = r.ReadUInt32();
-                    tag = new string(r.ReadChars(4));
+                    tag = r.Read4C();
                 }
             }
 
@@ -157,6 +184,22 @@ namespace BSPParser
                 LUMP_FACES_HDR = 58,    // HDR maps may have different face data.
                 LUMP_MAP_FLAGS = 59,   // extended level-wide flags. not present in all levels
                 LUMP_OVERLAY_FADES = 60, // Fade distances for overlays
+            }
+
+            private struct GameLump {
+                public string tag;
+                public ushort flags;
+                public ushort version;
+                public uint offset;
+                public uint length;
+
+                public GameLump(BinaryReader r) : this() {
+                    tag = r.Read4C();
+                    flags = r.ReadUInt16();
+                    version = r.ReadUInt16();
+                    offset = r.ReadUInt32();
+                    length = r.ReadUInt32();
+                }
             }
 
         }

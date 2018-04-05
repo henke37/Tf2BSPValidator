@@ -7,6 +7,10 @@ using System.Threading.Tasks;
 
 namespace BSPParser {
     static class ExtensionFunctions {
+        public static string Read4C(this BinaryReader r) {
+            return new string(r.ReadChars(4));
+        }
+
         public static string ReadUTFString(this BinaryReader r, int bytesToRead) {
             var ba = r.ReadBytes(bytesToRead);
             return new String(Encoding.UTF8.GetChars(ba, 0, bytesToRead - 1));
