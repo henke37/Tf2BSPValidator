@@ -29,7 +29,7 @@ namespace BSPValidator {
             Init(File.OpenRead(filename));
         }
 
-        private BSPValidator(Stream stream) {
+        public BSPValidator(Stream stream) {
             Init(stream);
         }
 
@@ -37,7 +37,7 @@ namespace BSPValidator {
             bsp = new BSP(stream);
         }
 
-        private void Validate() {
+        public void Validate() {
             if(bsp.version != TF2_BSP_VERSION) error("Wrong BSP Version");
 
             ValidateEntities();
@@ -46,55 +46,63 @@ namespace BSPValidator {
         private void ValidateEntities() {
             BuildEntTargetNameLUT();
             foreach(var kv in bsp.entData) {
-                string classname = kv["classname"].GetString();
-
-                switch(classname) {
-                    case "prop_dynamic":
-                    case "prop_physics":
-                        ValidateModel(kv["model"].GetString());
-                        break;
-                        
-                    case "team_control_point":
-                        EnsureOneTargetEntity(kv["targetname"].GetString());
-                        break;
-
-                    //entclasess with no current validation
-                    case "worldspawn":
-                    case "func_door":
-                    case "func_areaportal":
-                    case "info_player_teamspawn":
-                    case "item_healthkit_small":
-                    case "item_healthkit_medium":
-                    case "item_healthkit_large":
-                    case "item_ammopack_small":
-                    case "item_ammopack_medium":
-                    case "item_ammopack_large":
-                    case "trigger_multiple":
-                    case "trigger_hurt":
-                    case "filter_activator_tfteam":
-                    case "tf_gamerules":
-                    case "team_control_point_master":
-                    case "shadow_control":
-                    case "light_environment":
-                    case "env_tonemap_controller":
-                    case "env_fog_controller":
-                    case "water_lod_control":
-                    case "team_round_timer":
-                    case "func_respawnroom":
-                    case "trigger_capture_area":
-                    case "game_round_win":
-                    case "logic_auto":
-                    case "logic_relay":
-                    case "func_respawnroomvisualizer":
-                    case "func_nobuild":
-                    case "info_observer_point":
-                    case "func_regenerate":
-                    case "light":
-                        break;
-
-                    default:
-                        break;
+                try {
+                    ValidateEntity(kv);
+                } catch(Exception ex) {
+                    error(ex.Message);
                 }
+            }
+        }
+
+        private void ValidateEntity(KeyValue kv) {
+            string classname = kv["classname"].GetString();
+
+            switch(classname) {
+                case "prop_dynamic":
+                case "prop_physics":
+                    ValidateModel(kv["model"].GetString());
+                    break;
+
+                case "team_control_point":
+                    EnsureOneTargetEntity(kv["targetname"].GetString());
+                    break;
+
+                //entclasess with no current validation
+                case "worldspawn":
+                case "func_door":
+                case "func_areaportal":
+                case "info_player_teamspawn":
+                case "item_healthkit_small":
+                case "item_healthkit_medium":
+                case "item_healthkit_large":
+                case "item_ammopack_small":
+                case "item_ammopack_medium":
+                case "item_ammopack_large":
+                case "trigger_multiple":
+                case "trigger_hurt":
+                case "filter_activator_tfteam":
+                case "tf_gamerules":
+                case "team_control_point_master":
+                case "shadow_control":
+                case "light_environment":
+                case "env_tonemap_controller":
+                case "env_fog_controller":
+                case "water_lod_control":
+                case "team_round_timer":
+                case "func_respawnroom":
+                case "trigger_capture_area":
+                case "game_round_win":
+                case "logic_auto":
+                case "logic_relay":
+                case "func_respawnroomvisualizer":
+                case "func_nobuild":
+                case "info_observer_point":
+                case "func_regenerate":
+                case "light":
+                    break;
+
+                default:
+                    break;
             }
         }
 
@@ -123,6 +131,10 @@ namespace BSPValidator {
 
         private void ValidateModel(string v) {
             
+        }
+
+        private void ValidateMaterial(string name) {
+
         }
 
         private void error(string msg) {
