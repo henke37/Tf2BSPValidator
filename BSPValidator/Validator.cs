@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace BSPValidator {
@@ -83,11 +84,27 @@ namespace BSPValidator {
                 case "item_ammopack_small":
                 case "item_ammopack_medium":
                 case "item_ammopack_large":
+                case "tf_spell_pickup":
                     ValidateItemEntity(kv);
                     break;
 
                 case "team_control_point":
-                    EnsureOneTargetEntity(kv["targetname"].GetString());
+                    EnsureZeroOrOneTargetEntity(kv["team_previouspoint_2_0"].GetString());
+                    EnsureZeroOrOneTargetEntity(kv["team_previouspoint_2_1"].GetString());
+                    EnsureZeroOrOneTargetEntity(kv["team_previouspoint_2_2"].GetString());
+                    EnsureZeroOrOneTargetEntity(kv["team_previouspoint_3_0"].GetString());
+                    EnsureZeroOrOneTargetEntity(kv["team_previouspoint_3_1"].GetString());
+                    EnsureZeroOrOneTargetEntity(kv["team_previouspoint_3_2"].GetString());
+                    break;
+
+
+                case "func_regenerate":
+                    EnsureOneTargetEntity(kv["associatedmodel"].GetString());
+                    break;
+
+
+                case "team_control_point_master":
+                    ValidateControlPointLayout(kv["caplayout"].GetString());
                     break;
 
                 //entclasess with no current validation
@@ -99,7 +116,6 @@ namespace BSPValidator {
                 case "trigger_hurt":
                 case "filter_activator_tfteam":
                 case "tf_gamerules":
-                case "team_control_point_master":
                 case "shadow_control":
                 case "light_environment":
                 case "env_tonemap_controller":
@@ -114,13 +130,16 @@ namespace BSPValidator {
                 case "func_respawnroomvisualizer":
                 case "func_nobuild":
                 case "info_observer_point":
-                case "func_regenerate":
                 case "light":
                     break;
 
                 default:
                     break;
             }
+        }
+
+        private void ValidateControlPointLayout(string v) {
+            if(!Regex.IsMatch(v,@"^[0-7 ,]*[0-7]$")) error("Bad capture point layout");
         }
 
         private void ValidateItemEntity(KeyValue kv) {
@@ -132,6 +151,12 @@ namespace BSPValidator {
         private void EnsureOneTargetEntity(string targetName) {
             if(!entTargetNameMap.TryGetValue(targetName, out List<KeyValue> nameList)) {
                 error($"Missing entity with targetname {targetName}");
+            }
+            if(nameList.Count != 1) error($"Duplicate entities with targetname {targetName}");
+        }
+        private void EnsureZeroOrOneTargetEntity(string targetName) {
+            if(!entTargetNameMap.TryGetValue(targetName, out List<KeyValue> nameList)) {
+                return;
             }
             if(nameList.Count != 1) error($"Duplicate entities with targetname {targetName}");
         }
