@@ -11,7 +11,7 @@ namespace BSPParser
     public class BSP {
         public uint version;
 
-        public KeyValue entData;
+        public KeyValue[] entData;
 
         public BSP(Stream stream) {
             Parse(stream);
@@ -55,7 +55,7 @@ namespace BSPParser
             private void ParseEntData() {
                 Stream lumpStream = GetLump(LumpType.LUMP_ENTITIES);
                 var r = new BinaryReader(lumpStream);
-                bsp.entData = KVParser.ParseKeyValueText(
+                bsp.entData = KVParser.ParseAllKVRootNodes(
                     r.ReadUTFString((int)lumpStream.Length)
                 );
             }
