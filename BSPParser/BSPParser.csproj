@@ -4,16 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{3004DA95-FD28-48E0-93E2-5C18C66E971B}</ProjectGuid>
-    <OutputType>Exe</OutputType>
-    <RootNamespace>BSPValidator</RootNamespace>
-    <AssemblyName>BSPValidator</AssemblyName>
+    <ProjectGuid>{E48C397D-9726-4CB6-ACD3-31B8133F056F}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>BSPParser</RootNamespace>
+    <AssemblyName>BSPParser</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -23,7 +22,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -40,26 +38,10 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
-    <Reference Include="ValveKeyValue, Version=0.2.1.107, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ValveKeyValue.0.2.1.107\lib\netstandard2.0\ValveKeyValue.dll</HintPath>
-    </Reference>
-    <Reference Include="ValvePak, Version=0.4.0.11, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ValvePak.0.4.0.11\lib\net40\ValvePak.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
+    <Compile Include="BSP.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\BSPParser\BSPParser.csproj">
-      <Project>{e48c397d-9726-4cb6-acd3-31b8133f056f}</Project>
-      <Name>BSPParser</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

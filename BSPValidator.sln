@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.27130.2020
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BSPValidator", "BSPValidator\BSPValidator.csproj", "{3004DA95-FD28-48E0-93E2-5C18C66E971B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BSPParser", "BSPParser\BSPParser.csproj", "{E48C397D-9726-4CB6-ACD3-31B8133F056F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{3004DA95-FD28-48E0-93E2-5C18C66E971B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3004DA95-FD28-48E0-93E2-5C18C66E971B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3004DA95-FD28-48E0-93E2-5C18C66E971B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E48C397D-9726-4CB6-ACD3-31B8133F056F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E48C397D-9726-4CB6-ACD3-31B8133F056F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E48C397D-9726-4CB6-ACD3-31B8133F056F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E48C397D-9726-4CB6-ACD3-31B8133F056F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
