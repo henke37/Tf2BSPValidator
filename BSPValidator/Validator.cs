@@ -9,7 +9,8 @@ using System.Threading.Tasks;
 
 namespace BSPValidator {
     class BSPValidator {
-        private const uint TF2_BSP_VERSION=20;
+        private const uint TF2_BSP_VERSION = 20;
+        private const int TF2_STEAM_APPID = 440;
 
         private BSP bsp;
 
@@ -22,7 +23,13 @@ namespace BSPValidator {
             }
 
             var v = new BSPValidator(args[0]);
+            v.MountGame(TF2_STEAM_APPID);
             v.Validate();
+        }
+
+        private void MountGame(int appId) {
+            string installPath=SteamHelper.GetInstallPathForApp(appId);
+
         }
 
         public BSPValidator(string filename) {

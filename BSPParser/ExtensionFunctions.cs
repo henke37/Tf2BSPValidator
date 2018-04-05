@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace BSPParser {
-    static class ExtensionFunctions {
+    public static class ExtensionFunctions {
         public static string Read4C(this BinaryReader r) {
             return new string(r.ReadChars(4));
         }
