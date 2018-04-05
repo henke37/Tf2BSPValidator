@@ -146,6 +146,10 @@ namespace BSPValidator {
         }
 
         private void ValidateFile(string name) {
+            //Try the pakfile
+            var entry=bsp.pakFile.GetEntry(name);
+            if(entry!=null) return;
+
         }
 
         private void ValidateModel(string name) {

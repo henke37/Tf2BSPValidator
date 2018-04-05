@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ICSharpCode.SharpZipLib.Zip;
 
 namespace BSPParser
 {
@@ -15,6 +16,7 @@ namespace BSPParser
         public string[] staticPropModels;
         public StaticProp[] staticProps;
 
+        public ZipFile pakFile;
 
         public BSP(Stream stream) {
             Parse(stream);
@@ -53,7 +55,13 @@ namespace BSPParser
 
                     ParseEntData();
                     ParseGameLump();
+                    ParsePakFileLump();
                 }
+            }
+
+            private void ParsePakFileLump() {
+                Stream lumpStream = GetLump(LumpType.LUMP_PAKFILE);
+                bsp.pakFile = new ZipFile(lumpStream);
             }
 
             private void ParseGameLump() {
