@@ -62,7 +62,7 @@ namespace BSPParser
                     GameLump lump = new GameLump(r);
 
                     switch(lump.tag) {
-                        case "sprp":
+                        case "prps":
                             ParseStaticPropLump(lump.version,new SubStream(masterStream, lump.offset,lump.length));
                             break;
                     }
@@ -76,7 +76,11 @@ namespace BSPParser
             }
 
             private void ParseStaticPropLump(ushort version, BinaryReader r) {
-                throw new NotImplementedException();
+                uint modelCount = r.ReadUInt32();
+                string[] models = new string[modelCount];
+                for(uint modelIndex=0;modelIndex<modelCount;++modelIndex) {
+                    models[modelIndex] = r.ReadUTFString(128).TrimEnd('\0');
+                }
             }
 
             private void ParseEntData() {
