@@ -73,9 +73,14 @@ namespace BSPValidator {
             string classname = kv["classname"].GetString();
 
             switch(classname) {
+                case "prop_dynamic_override":
                 case "prop_dynamic":
+                case "prop_physics_override":
                 case "prop_physics":
-                    ValidateModel(kv["model"].GetString());
+                case "prop_physics_multiplayer":
+                case "prop_ragdoll":
+                case "prop_dynamic_ornament":
+                    ValidateModel(kv["model"], kv["skin"]);
                     break;
 
                 case "item_healthkit_small":
@@ -109,9 +114,11 @@ namespace BSPValidator {
 
                 case "trigger_capture_area":
                     EnsureOneTargetEntity(kv["area_cap_point"], "team_control_point");
+                    EnsureZeroOrOneTargetEntity(kv["filtername"]);
                     break;
                 case "trigger_timer_door":
                     EnsureOneTargetEntity(kv["area_cap_point"], "team_control_point");
+                    EnsureZeroOrOneTargetEntity(kv["filtername"]);
                     EnsureOneTargetEntity(kv["door_name"]);
                     break;
 
@@ -173,6 +180,7 @@ namespace BSPValidator {
 
                 case "trigger_catapult":
                     EnsureOneTargetEntity(kv["launchTarget"]);
+                    EnsureZeroOrOneTargetEntity(kv["filtername"]);
                     break;
 
                 case "tf_glow":
@@ -194,12 +202,213 @@ namespace BSPValidator {
                     EnsureZeroOrOneTargetEntity(kv["associated_team_entity"]);
                     break;
 
-                //entclasess with no current validation
-                case "worldspawn":
-                case "func_door":
-                case "func_areaportal":
+                case "npc_template_maker":
+                    EnsureOneTargetEntity(kv["TemplateName"]);
+                    break;
+
                 case "trigger_multiple":
                 case "trigger_hurt":
+                case "trigger_look":
+                case "trigger_once":
+                case "trigger_push":
+                case "trigger_wind":
+                case "trigger_impact":
+                case "trigger_proximity":
+                case "trigger_teleport":
+                case "trigger_teleport_relative":
+                case "trigger_transition":
+                case "trigger_serverragdoll":
+                case "trigger_apply_impulse":
+                    EnsureZeroOrOneTargetEntity(kv["filtername"]);
+                    break;
+
+                case "ambient_generic":
+                    ValidateSound(kv["message"].GetString());
+                    EnsureZeroOrOneTargetEntity(kv["SourceEntityName"]);
+                    break;
+
+                case "env_texturetoggle":
+                    EnsureOneOrMoreTargetEntities(kv["target"]);
+                    break;
+
+                case "env_particlelight":
+                    EnsureOneTargetEntity(kv["PSName"],"env_smokestack");
+                    break;
+
+                case "env_smokestack":
+                    ValidateMaterial(kv["SmokeMaterial"].GetString());
+                    break;
+
+                case "func_ladderendpoint":
+                    EnsureOneTargetEntity(kv["target"], "func_ladderendpoint");
+                    break;
+
+                case "func_areaportalwindow":
+                    EnsureOneTargetEntity(kv["target"]);
+                    break;
+
+                case "func_clip_vphysics":
+                    EnsureOneTargetEntity(kv["filtername"]);
+                    break;
+
+                case "env_rotorshooter":
+                case "env_shooter":
+                    ValidateModel(kv["shootmodel"].GetString());
+                    break;
+
+                case "env_soundscape_proxy":
+                    EnsureOneTargetEntity(kv["MainSoundscapeName"]);
+                    break;
+
+                case "env_soundscape_triggerable":
+                case "env_soundscape":
+                    EnsureZeroOrOneTargetEntity(kv["position0"]);
+                    EnsureZeroOrOneTargetEntity(kv["position1"]);
+                    EnsureZeroOrOneTargetEntity(kv["position2"]);
+                    EnsureZeroOrOneTargetEntity(kv["position3"]);
+                    EnsureZeroOrOneTargetEntity(kv["position4"]);
+                    EnsureZeroOrOneTargetEntity(kv["position5"]);
+                    EnsureZeroOrOneTargetEntity(kv["position6"]);
+                    EnsureZeroOrOneTargetEntity(kv["position7"]);
+                    break;
+
+                case "point_tesla":
+                    EnsureZeroOrOneTargetEntity(kv["m_SourceEntityName"]);
+                    break;
+
+                case "info_overlay_transition":
+                case "info_overlay":
+                    ValidateMaterial(kv["material"].GetString());
+                    break;
+
+                case "info_particle_system":
+                    for(int pointIndex = 1; pointIndex <= 62; pointIndex++) {
+                        EnsureZeroOrOneTargetEntity(kv["cpoint"+pointIndex]);
+                    }
+                    break;
+
+                case "phys_ragdollmagnet":
+                    EnsureZeroOrOneTargetEntity(kv["target"]);
+                    break;
+
+                case "light_dynamic":
+                    EnsureZeroOrOneTargetEntity(kv["target"]);
+                    break;
+
+                case "move_rope":
+                case "keyframe_rope":
+                    EnsureZeroOrOneTargetEntity(kv["NextKey"]);
+                    break;
+
+                case "logic_lineto":
+                    EnsureOneTargetEntity(kv["source"]);
+                    EnsureOneTargetEntity(kv["target"]);
+                    break;
+
+                case "point_template":
+                    for(int pointIndex = 1; pointIndex <= 16; pointIndex++) {
+                        EnsureZeroOrOneTargetEntity(kv[$"Template{pointIndex:G2}"]);
+                    }
+                    break;
+
+                case "env_entity_maker":
+                    EnsureOneTargetEntity(kv["EntityTemplate"]);
+                    break;
+
+                case "filter_multi":
+                    for(int pointIndex = 1; pointIndex <= 5; pointIndex++) {
+                        EnsureZeroOrOneTargetEntity(kv[$"Filter{pointIndex:G2}"]);
+                    }
+                    break;
+                case "filter_activator_name":
+                    EnsureOneTargetEntity(kv["filtername"]);
+                    break;
+
+                case "point_anglesensor":
+                    EnsureOneTargetEntity(kv["target"]);
+                    EnsureOneTargetEntity(kv["lookatname"]);
+                    break;
+                case "point_proximity_sensor":
+                case "point_velocitysensor":
+                case "point_angularvelocitysensor":
+                    EnsureOneTargetEntity(kv["target"]);
+                    break;
+
+                case "point_teleport":
+                    EnsureOneTargetEntity(kv["target"]);
+                    break;
+                case "point_hurt":
+                    EnsureZeroOrOneTargetEntity(kv["target"]);
+                    break;
+
+                case "phys_keepupright":
+                    EnsureOneTargetEntity(kv["attach1"]);
+                    break;
+                case "info_mass_center":
+                    EnsureZeroOrOneTargetEntity(kv["target"]);
+                    break;
+                case "phys_ragdollconstraint":
+                case "phys_lengthconstraint":
+                case "phys_slideconstraint":
+                case "phys_pulleyconstraint":
+                case "phys_constraint":
+                case "phys_ballsocket":
+                case "phys_hinge":
+                case "phys_spring":
+                    EnsureOneTargetEntity(kv["attach1"]);
+                    EnsureOneTargetEntity(kv["attach2"]);
+                    break;
+                case "phys_convert":
+                    EnsureOneTargetEntity(kv["target"]);
+                    break;
+                case "phys_motor":
+                case "phys_torque":
+                case "phys_thruster":
+                    EnsureOneTargetEntity(kv["attach1"]);
+                    break;
+                case "phys_magnet":
+                    ValidateModel(kv["model"], kv["skin"]);
+                    break;
+
+                case "func_areaportal":
+                    EnsureZeroOrOneTargetEntity(kv["target"]);
+                    break;
+
+                case "func_trackchange":
+                case "func_trackautochange":
+                    EnsureOneTargetEntity(kv["train"]);
+                    EnsureOneTargetEntity(kv["toptrack"]);
+                    EnsureOneTargetEntity(kv["bottomtrack"]);
+                    break;
+
+                case "func_tracktrain":
+                    EnsureOneTargetEntity(kv["target"]);
+                    break;
+                case "path_track":
+                    EnsureZeroOrOneTargetEntity(kv["target"]);
+                    EnsureZeroOrOneTargetEntity(kv["altpath"]);
+                    break;
+
+                case "trigger_soundscape":
+                    EnsureOneTargetEntity(kv["soundscape"]);
+                    break;
+
+                case "logic_measure_movement":
+                    EnsureOneTargetEntity(kv["MeasureTarget"]);
+                    EnsureOneTargetEntity(kv["MeasureReference"]);
+                    EnsureOneTargetEntity(kv["Target"]);
+                    EnsureOneTargetEntity(kv["TargetReference"]);
+                    break;
+
+                case "env_projectedtexture":
+                    EnsureOneTargetEntity(kv["target"]);
+                    break;
+
+
+                //entclasess with no current validation
+                case "env_beam":
+                case "worldspawn":
+                case "func_door":
                 case "filter_activator_tfteam":
                 case "tf_gamerules":
                 case "shadow_control":
@@ -212,6 +421,7 @@ namespace BSPValidator {
                 case "game_round_win":
                 case "logic_auto":
                 case "logic_relay":
+                case "logic_timer":
                 case "func_respawnroomvisualizer":
                 case "func_nobuild":
                 case "light":
@@ -232,6 +442,27 @@ namespace BSPValidator {
             ValidateModel(modelOverrideKv.GetString());
         }
 
+        private void EnsureOneOrMoreTargetEntities(KeyValue targetName, string targetClass = null) {
+            if(targetName == null) {
+                error("No entity specified");
+                return;
+            }
+            EnsureOneOrMoreTargetEntities(targetName.GetString(), targetClass);
+        }
+
+        private void EnsureOneOrMoreTargetEntities(string targetName, string targetClass = null) {
+            if(!entTargetNameMap.TryGetValue(targetName, out List<KeyValue> nameList)) {
+                error($"Missing entity with targetname {targetName}");
+            }
+            if(nameList.Count != 1) error($"Duplicate entities with targetname {targetName}");
+            if(targetClass != null) {
+                foreach(var target in nameList) {
+                    if(target["classname"].GetString() != targetClass) {
+                        error("Target entity class mismatch");
+                    }
+                }
+            }
+        }
 
         private void EnsureOneTargetEntity(KeyValue targetName, string targetClass = null) {
             if(targetName == null) {
@@ -309,6 +540,9 @@ namespace BSPValidator {
         }
 
         private void ValidateParticleEffect(string name) {
+
+        }
+        private void ValidateSound(string name) {
 
         }
 
