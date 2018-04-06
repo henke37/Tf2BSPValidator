@@ -6,9 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using KVLib;
 using Microsoft.Win32;
 using BSPParser;
+using ValveKeyValue;
 
 namespace BSPValidator {
     class SteamHelper {
@@ -33,7 +33,7 @@ namespace BSPValidator {
             for(uint libraryId = 1; ; ++libraryId) {
                 var folder = kv[libraryId.ToString()];
                 if(folder == null) break;
-                libraries.Add(fixSlashes(folder.GetString()));
+                libraries.Add(fixSlashes(folder.ToString()));
             }
 
             return libraries;
@@ -46,8 +46,8 @@ namespace BSPValidator {
         internal static string GetInstallPathForApp(int appId) {
             foreach(var libraryFolder in libraryFolders) {
                 try {
-                    KeyValue manifest = parseKVFile($@"{libraryFolder}\steamapps\appmanifest_{appId}.acf");
-                    string installDir = fixSlashes(manifest["installdir"].GetString());
+                    KVObject manifest = parseKVFile($@"{libraryFolder}\steamapps\appmanifest_{appId}.acf");
+                    string installDir = fixSlashes(manifest["installdir"].ToString());
                     return $@"{libraryFolder}\steamapps\common\{installDir}";
                 } catch(FileNotFoundException) {
                     continue;
@@ -56,12 +56,13 @@ namespace BSPValidator {
             throw new KeyNotFoundException();
         }
 
-        private static KeyValue parseKVFile(string filename) {
+        private static KVObject parseKVFile(string filename) {
             return parseKVStream(File.OpenRead(filename));
         }
 
-        private static KeyValue parseKVStream(Stream s) {
-            return KVParser.ParseAllKVRootNodes(s.ReadAsUTF8())[0];
+        private static KVObject parseKVStream(Stream s) {
+            var decoder = KVSerializer.Create(KVSerializationFormat.KeyValues1Text);
+            return decoder.Deserialize(s);
         }
     }
 }

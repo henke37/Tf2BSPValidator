@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using VPK = SteamDatabase.ValvePak.Package;
 
 namespace BSPValidator {
     class BSPValidator {
@@ -16,6 +17,7 @@ namespace BSPValidator {
         private BSP bsp;
 
         private Dictionary<string, List<KeyValue>> entTargetNameMap;
+        private List<VPK> vpks;
 
         static void Main(string[] args) {
             if(args.Length != 1) {
@@ -24,13 +26,8 @@ namespace BSPValidator {
             }
 
             var v = new BSPValidator(args[0]);
-            v.MountGame(TF2_STEAM_APPID);
+            v.MountGame(TF2_STEAM_APPID, "tf", "hl2");
             v.Validate();
-        }
-
-        private void MountGame(int appId) {
-            string installPath = SteamHelper.GetInstallPathForApp(appId);
-
         }
 
         public BSPValidator(string filename) {
@@ -43,6 +40,23 @@ namespace BSPValidator {
 
         private void Init(Stream stream) {
             bsp = new BSP(stream);
+            vpks = new List<VPK>();
+        }
+
+        private void MountGame(int appId, params string[] gameFolders) {
+            string installPath = SteamHelper.GetInstallPathForApp(appId);
+            foreach(var gameFolder in gameFolders) {
+                MountGameFolder($@"{installPath}\{gameFolder}");
+            }
+        }
+
+        private void MountGameFolder(string folder) {
+            foreach(var file in Directory.EnumerateFiles(folder, "*_dir.vpk")) {
+                var vpk = new VPK();
+                vpk.Read(file);
+
+                vpks.Add(vpk);
+            }
         }
 
         public void Validate() {
@@ -537,11 +551,20 @@ namespace BSPValidator {
         #endregion
 
         private Stream OpenFile(string name) {
+            name = name.ToLower();
             //Try the pakfile
             var entryIndex = bsp.pakFile.FindEntry(name,true);
             if(entryIndex != -1) {
                 var s = bsp.pakFile.GetInputStream(entryIndex);
                 return s;
+            }
+            //try all the VPK files next
+            foreach(var vpk in vpks) {
+                var entry=vpk.FindEntry(name);
+                if(entry == null) continue;
+
+                vpk.ReadEntry(entry, out byte[] buf);
+                return new MemoryStream(buf, false);
             }
 
             error($"Failed to find required file {name}");
