@@ -44,7 +44,7 @@ namespace BSPParser
             }
 
             public void Parse() {
-                using(BinaryReader reader = new BinaryReader(masterStream)) {
+                using(BinaryReader reader = new BinaryReader(masterStream,Encoding.Default,true)) {
                     string sig = reader.Read4C(); 
                     if(sig != FILE_SIGNATURE) throw new ArgumentException("That's not a BSP file!");
                     bsp.version = reader.ReadUInt32();
