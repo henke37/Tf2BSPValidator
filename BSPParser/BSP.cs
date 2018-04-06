@@ -132,6 +132,7 @@ namespace BSPParser
 
             private Stream GetLump(LumpType lumpId) {
                 Lump_t lump = lumps[(int)lumpId];
+                if(lump.offset == 0) return null;
 
                 return new SubStream(masterStream, lump.offset, lump.length);
             }

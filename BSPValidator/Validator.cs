@@ -532,11 +532,16 @@ namespace BSPValidator {
             }
         }
 
-        private void ValidateFile(string name) {
+        private Stream OpenFile(string name) {
             //Try the pakfile
-            var entry = bsp.pakFile.FindEntry(name,true);
-            if(entry != -1) return;
+            var entryIndex = bsp.pakFile.FindEntry(name,true);
+            if(entryIndex != -1) {
+                var s = bsp.pakFile.GetInputStream(entryIndex);
+                return s;
+            }
 
+            error($"Failed to find required file {name}");
+            return null;
         }
 
 
@@ -546,15 +551,16 @@ namespace BSPValidator {
         }
 
         private void ValidateModel(string name, int skin = 0) {
-            ValidateFile(name);
+            OpenFile(name);
         }
 
         private void ValidateMaterial(string name) {
-            ValidateFile($"materials/{name}.vmt");
+            var stream=OpenFile($"materials/{name}.vmt");
+            if(stream == null) return;
         }
 
         private void ValidateTexture(string name) {
-            ValidateFile(name);
+            OpenFile(name);
         }
 
         private void ValidateParticleEffect(string name) {
