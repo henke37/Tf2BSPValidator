@@ -92,10 +92,10 @@ namespace BSPValidator {
 
                 case "item_healthkit_small":
                 case "item_healthkit_medium":
-                case "item_healthkit_large":
+                case "item_healthkit_full":
                 case "item_ammopack_small":
                 case "item_ammopack_medium":
-                case "item_ammopack_large":
+                case "item_ammopack_full":
                 case "tf_spell_pickup":
                     ValidateItemEntity(kv);
                     break;
@@ -432,6 +432,17 @@ namespace BSPValidator {
                 case "func_respawnroomvisualizer":
                 case "func_nobuild":
                 case "light":
+                case "light_spot":
+                case "point_spotlight":
+                case "env_lightglow":
+                case "env_sprite":
+                case "func_illusionary":
+                case "info_player_start":
+                case "func_brush":
+                case "point_devshot_camera":
+                case "info_intermission":
+                case "sky_camera":
+                case "func_occluder":
                     break;
 
                 default:
