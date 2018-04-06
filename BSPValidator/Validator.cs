@@ -561,6 +561,27 @@ namespace BSPValidator {
         private void ValidateMaterial(string name) {
             var stream=OpenFile($"materials/{name}.vmt");
             if(stream == null) return;
+            
+            ValidateMaterialContents(stream.ReadAsUTF8());
+        }
+
+        private void ValidateMaterialContents(string contents) {
+            KeyValue kv = KVParser.ParseKeyValueText(contents);
+
+            ValidateMaterialContents(kv);
+        }
+
+        private void ValidateMaterialContents(KeyValue kv) {
+            if(kv.Key=="patch") {
+                string templateFileName = kv["include"].GetString();
+                var stream = OpenFile(templateFileName);
+                if(stream == null) return;
+                string templateContents = stream.ReadAsUTF8();
+
+                KeyValue replaceKv = kv["replace"];
+                foreach(var subst in replaceKv.Children) {
+                }
+            }
         }
 
         private void ValidateTexture(string name) {
