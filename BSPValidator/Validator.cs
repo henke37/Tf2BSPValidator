@@ -65,6 +65,8 @@ namespace BSPValidator {
             }
         }
 
+        #region entity validation
+
         private void ValidateEntities() {
             BuildEntTargetNameLUT();
             foreach(var kv in bsp.entData) {
@@ -531,6 +533,8 @@ namespace BSPValidator {
                 nameList.Add(kv);
             }
         }
+
+        #endregion
 
         private Stream OpenFile(string name) {
             //Try the pakfile
